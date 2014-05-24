@@ -1,3 +1,6 @@
 raw/
+submissions/
+*arff
+scores*
 .RData
 .Rproj.user

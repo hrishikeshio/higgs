@@ -1,7 +1,0 @@
-t	auc	auc[Signal]	auc[Background]	e01	w01		auc	auc[Signal]	auc[Background]	e01	w01	time	
-
-Column description:
--------------------
-auc: Area Under The ROC Curve
-e01: Zero-One Error (error = max positive class score < max negative class score)
-w01: Weighted Zero-One Error (error = max positive class score < max negative class score)
