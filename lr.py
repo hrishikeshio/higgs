@@ -1,19 +1,23 @@
+import csv
+import math
+import copy
+import gzip
+from operator import itemgetter
+import numpy as np
+
 from sklearn import decomposition
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
-import csv
-import numpy as np
-import math
 from sklearn.svm import LinearSVC, SVC
 from sklearn import cross_validation
 from sklearn.preprocessing import *
 from sklearn.grid_search import GridSearchCV
 from sklearn.feature_selection import SelectPercentile, f_classif
-import copy
-from operator import itemgetter
-import gzip
 from sklearn.ensemble import ExtraTreesClassifier
 from sklearn.pipeline import Pipeline
+
+from HiggsBosonCompetition_AMSMetric_rev1 import AMS_metric
+
 X_train=[]
 y_train=[]
 X_test=[]
@@ -22,6 +26,8 @@ y_test=[]
 test_mode=0
 feature_selection=1
 X_test_eeventids=[]
+
+##############################Import data############################################
 
 with open("raw/training.csv","rb") as f:
 	reader=csv.reader(f)
@@ -69,7 +75,7 @@ print "Input data read"
 # 	#        label=r'Univariate score ($-Log(p_{value})$)', color='g')
 
 
-print "feature selection done"
+# print "feature selection done"
 ################################CLassifier Name #############################################
 # clf2=RandomForestClassifier()
 # clf2=SVC()
@@ -124,7 +130,7 @@ length.next()
 for a in ans_sorted:
 	ranked.append(a+[length.next()])
 # print "ranked",ranked
-name="extratreesandrf"
+name="submission_ours"
 
 with open("submissions/"+name+".csv","wb") as f:
 	writer=csv.writer(f)

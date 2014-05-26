@@ -2,6 +2,7 @@
 import random,string,math,csv,pandas
 import numpy as np
 import matplotlib.pyplot as plt
+import subprocess
 
 def DataToArff(xs,labels,weights,header,title,fileName):
     outFile = open(fileName + ".arff","w")
@@ -24,8 +25,8 @@ def DataToArff(xs,labels,weights,header,title,fileName):
     outFile.close()
 
 
-all = list(csv.reader(open("raw/training.csv","rb"), delimiter=','))
-
+all = list(csv.reader(open("../raw/training.csv","rb"), delimiter=','))
+print "training file read"
 header = np.array(all[0][1:-2])
 
 xs = np.array([map(float, row[1:-2]) for row in all[1:]])
@@ -67,7 +68,9 @@ DataToArff(xsTrain,labelsTrain,weightsTrain,header,"HiggsML_challenge_train","tr
 DataToArff(xsTrain,labelsTrain,weightsTrain,header,"HiggsML_challenge_train","training")
 DataToArff(xsValidation,labelsValidation,weightsValidation,header,"HiggsML_challenge_validation","validation")
 
-
+print "Running training"
+subprocess.call(["./multiboost", "--configfile","config.txt"])
+print "training done"
 resultsText = list(csv.reader(open("results.dta","rb"), delimiter='\t'))
 ts = [int(result[0]) for result in resultsText]
 # trainErrors = np.array([float(result[5]) for result in resultsText])
@@ -102,6 +105,8 @@ def AMS(s,b):
     return math.sqrt(2 * ((s + b + bReg) * 
                           math.log(1 + s / (b + bReg)) - s))
 
+subprocess.call(["./multiboost", "--configfile","configScoresValidation.txt"])
+
 validationScoresText = list(csv.reader(open("scoresValidation.txt","rb"), delimiter=','))
 validationScores = np.array([float(score[0]) for score in validationScoresText])
 tIIs = validationScores.argsort()
@@ -126,43 +131,44 @@ for tI in range(len(tIIs)):
         b -= weightsValidation[tIIs[tI]]
 
 
-fig = plt.figure()
+# fig = plt.figure()
 
-fig.suptitle('MultiBoost AMS curves', fontsize=14, fontweight='bold')
-vsRank = fig.add_subplot(111)
-fig.subplots_adjust(top=0.85)
+# fig.suptitle('MultiBoost AMS curves', fontsize=14, fontweight='bold')
+# vsRank = fig.add_subplot(111)
+# fig.subplots_adjust(top=0.85)
 
-vsRank.set_xlabel('rank')
-vsRank.set_ylabel('AMS')
+# vsRank.set_xlabel('rank')
+# vsRank.set_ylabel('AMS')
 
-vsRank.plot(amss,'b-')
+# vsRank.plot(amss,'b-')
 
-vsRank.axis([0,len(amss), 0, 4])
+# vsRank.axis([0,len(amss), 0, 4])
 
-plt.show()
-fig = plt.figure()
-fig.suptitle('MultiBoost AMS curves', fontsize=14, fontweight='bold')
-vsScore = fig.add_subplot(111)
-fig.subplots_adjust(top=0.85)
+# plt.show()
+# fig = plt.figure()
+# fig.suptitle('MultiBoost AMS curves', fontsize=14, fontweight='bold')
+# vsScore = fig.add_subplot(111)
+# fig.subplots_adjust(top=0.85)
 
-vsScore.set_xlabel('score')
-vsScore.set_ylabel('AMS')
+# vsScore.set_xlabel('score')
+# vsScore.set_ylabel('AMS')
 
-vsScore.plot(validationScores[tIIs],amss,'b-')
+# vsScore.plot(validationScores[tIIs],amss,'b-')
 
-vsScore.axis([validationScores[tIIs[0]],validationScores[tIIs[-1]] , 0, 4])
+# vsScore.axis([validationScores[tIIs[0]],validationScores[tIIs[-1]] , 0, 4])
 
-plt.show()
-testText = list(csv.reader(open("raw/test.csv","rb"), delimiter=','))
+# plt.show()
+
+
+testText = list(csv.reader(open("../raw/test.csv","rb"), delimiter=','))
 testIds = np.array([int(row[0]) for row in testText[1:]])
 xsTest = np.array([map(float, row[1:]) for row in testText[1:]])
 weightsTest = np.repeat(1.0,len(testText)-1)
 labelsTest = np.repeat('s',len(testText)-1)
 DataToArff(xsTest,labelsTest,weightsTest,header,"HiggsML_challenge_test","test")
 
+subprocess.call(["./multiboost", "--configfile","configScoresTest.txt"])
 
-testText = list(csv.reader(open("raw/test.csv","rb"), delimiter=','))
-testIds = np.array([int(row[0]) for row in testText[1:]])
 testScoresText = list(csv.reader(open("scoresTest.txt", "rb"),delimiter=','))
 testScores = np.array([float(score[0]) for score in testScoresText])
 testInversePermutation = testScores.argsort()
