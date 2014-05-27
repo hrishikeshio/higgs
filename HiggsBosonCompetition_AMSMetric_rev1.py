@@ -38,9 +38,9 @@ def check_submission(submission, Nelements):
         sub.next() # header
         for row in sub:
             rankOrderSet.add(row[1])
-            
+    # print rankOrderSet
     if len(rankOrderSet) != Nelements:
-        print 'RankOrder column must contain unique values'
+        print 'RankOrder column must contain unique values', len(rankOrderSet) , Nelements
         exit()
     elif rankOrderSet.isdisjoint(set(xrange(1,Nelements+1))) == False:
         print 'RankOrder column must contain all numbers from [1..NTestSset]'
@@ -48,7 +48,7 @@ def check_submission(submission, Nelements):
     else:
         return True
 
-    
+
 def AMS(s, b):
     """ Approximate Median Significance defined as:
         AMS = sqrt(
@@ -65,13 +65,13 @@ def AMS(s, b):
         return math.sqrt(radicand)
 
 
-def AMS_metric(solution, submission):
+def AMS_metric(solution, submission,numEvents):
     """  Prints the AMS metric value to screen.
     Solution File header: EventId, Class, Weight
     Submission File header: EventId, RankOrder, Class
     """
     
-    numEvents = 550000 # number of events = size of test set
+    # numEvents = 550000 # number of events = size of test set
     
     # solutionDict: key=eventId, value=(label, class)
     solutionDict = create_solution_dictionary(solution)
@@ -83,23 +83,27 @@ def AMS_metric(solution, submission):
             sub = csv.reader(f)
             sub.next() # header row
             for row in sub:
+                print row
+                print solutionDict
                 if row[2] == 's': # only events predicted to be signal are scored
                     if solutionDict[row[0]][0] == 's':
                         signal += float(solutionDict[row[0]][1])
                     elif solutionDict[row[0]][0] == 'b':
                         background += float(solutionDict[row[0]][1])
-     
+                    exit()
+                
         print 'signal = {0}, background = {1}'.format(signal, background)
         print 'AMS = ' + str(AMS(signal, background))
 
 
 if __name__ == "__main__":
 
-    # enter path and file names here    
-    path = ""
-    solutionFile = ""
-    submissionFile = ""
+    # # enter path and file names here    
+    # path = ""
+    # solutionFile = ""
+    # submissionFile = ""
     
-    AMS_metric(solutionFile, submissionFile)
+    # AMS_metric(solutionFile, submissionFile)
+    print AMS_metric("solution.csv","submissions/"+"submission_ours"+".csv",100000)
     
     
