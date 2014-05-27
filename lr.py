@@ -23,7 +23,7 @@ y_train=[]
 X_test=[]
 y_test=[]
 
-test_mode=0
+test_mode=1
 feature_selection=1
 X_test_eeventids=[]
 
@@ -77,13 +77,13 @@ print "Input data read"
 
 # print "feature selection done"
 ################################CLassifier Name #############################################
-# clf2=RandomForestClassifier()
+clf2=RandomForestClassifier()
 # clf2=SVC()
 
-clf2 = Pipeline([
-  ('feature_selection', ExtraTreesClassifier()),
-  ('classification', RandomForestClassifier())
-])
+# clf2 = Pipeline([
+#   ('feature_selection', ExtraTreesClassifier()),
+#   ('classification', RandomForestClassifier())
+# ])
 if test_mode:
 	clf2.fit(X_train[:10],y_train[:10])
 	preds=clf2.predict(X_test[:10])
