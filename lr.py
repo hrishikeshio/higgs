@@ -96,7 +96,8 @@ if cross_validating:
 	event_ids=iter([a[0] for a in(X_test)])
 	print X_train[:10]
 	print X_test[:10]
-	solution=X_test[:,[0,-1]]
+	solution=X_test[:,[0,-1,-2]]
+	print "solution",solution[:10]
 	X_train=X_train[:,1:-2]
 	X_test=X_test[:,1:-2]
 
@@ -162,8 +163,8 @@ if cross_validating:
 	with open("solution.csv", "wb") as f:
 		writer=csv.writer(f)
 		solutionlist=solution.tolist()
-		ranks=range(len(solutionlist))
-		finalsolution=[[a[0],b,a[1]] for a,b in zip(solutionlist,[a[-1] for a in ranked])]
-		writer.writerow("EventId,RankOrder,Class".split(","))
-		writer.writerows(finalsolution)
-	print AMS_metric("solution.csv","submissions/"+name+".csv",len(solution))
+		# ranks=range(len(solutionlist))
+		# finalsolution=[[a[0],b,a[1]] for a,b in zip(solutionlist,[a[-1] for a in ranked])]
+		writer.writerow("EventId,Label,Weight".split(","))
+		writer.writerows(solution)
+	AMS_metric("solution.csv","submissions/"+name+".csv",len(solution))

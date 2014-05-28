@@ -24,6 +24,7 @@ def create_solution_dictionary(solution):
         for row in soln:
             if row[0] not in solnDict:
                 solnDict[row[0]] = (row[1], row[2])
+
     return solnDict
 
         
@@ -83,14 +84,13 @@ def AMS_metric(solution, submission,numEvents):
             sub = csv.reader(f)
             sub.next() # header row
             for row in sub:
-                print row
-                print solutionDict
+
                 if row[2] == 's': # only events predicted to be signal are scored
                     if solutionDict[row[0]][0] == 's':
                         signal += float(solutionDict[row[0]][1])
                     elif solutionDict[row[0]][0] == 'b':
                         background += float(solutionDict[row[0]][1])
-                    exit()
+ 
                 
         print 'signal = {0}, background = {1}'.format(signal, background)
         print 'AMS = ' + str(AMS(signal, background))
@@ -104,6 +104,6 @@ if __name__ == "__main__":
     # submissionFile = ""
     
     # AMS_metric(solutionFile, submissionFile)
-    print AMS_metric("solution.csv","submissions/"+"submission_ours"+".csv",100000)
+    AMS_metric("solution.csv","submissions/"+"submission_ours"+".csv",100000)
     
     
