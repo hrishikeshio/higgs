@@ -158,7 +158,7 @@ length.next()
 for a in ans_sorted:
     ranked.append(a + [length.next()])
 # print "ranked",ranked
-name = "submission_ours"
+name = "submission_ours" # Output file name
 
 with open("submissions/" + name + ".csv", "wb") as f:
     writer = csv.writer(f)
@@ -167,7 +167,7 @@ with open("submissions/" + name + ".csv", "wb") as f:
         writer.writerow([row[0], row[-1], row[1]])
 
 f_in = open("submissions/" + name + ".csv", 'rb')
-f_out = gzip.open("submissions/" + name + ".csv.gz", 'wb')
+f_out = gzip.open("submissions/" + name + ".csv.gz", 'wb') # Gzip file so we can upload it quickly
 f_out.writelines(f_in)
 f_out.close()
 f_in.close()
