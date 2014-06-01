@@ -23,13 +23,13 @@ X_train = []
 y_train = []
 X_test = []
 y_test = []
+X_test_eeventids = []
 
+# Set flags for this run 
 test_mode = 0
 feature_selection = 0
 cross_validating = 1
-X_test_eeventids = []
-
-
+ 
 ##############################Import data#################################
 # 1	EventId
 # 2	DER_mass_MMC
@@ -65,38 +65,11 @@ X_test_eeventids = []
 # 32	Weight
 # 33	Label
 
-# with open("raw/training.csv", "rb") as f:
-#     reader = csv.reader(f)
-#     titletrain = reader.next()
-#     titleidx = range(len(titletrain))
-#     # print titleidx
-#     print titletrain
-#     titletrainnew = titletrain[:24] + [titletrain[27]] + titletrain[30:]
-#     print titletrainnew
-#     # print title[1:14] #consider derived features only
-#     for row in reader:
-#         # X_train.append(row[1:14]) #consider derived features only
-#         X_train.append(row[:24] + [row[27]] + row[30:])
-#         # X_train.append(row[1:24]+[row[27]]+row[30:-2])
-#         y_train.append(row[-1:][0])
-
+#Read data
 X_train = pd.read_csv("raw/training.csv")
 y_train = X_train["Label"]
 X_test = pd.read_csv("raw/test.csv")
 print "Input data read"
-
-# with open("raw/test.csv", "rb") as f:
-#     reader = csv.reader(f)
-#     titletest = reader.next()
-#     titleidx = range(len(titletest))
-#     # print titleidx
-#     titletestnew = titletest[:24] + [titletest[27]] + titletest[30:]
-#     print titletestnew
-#     for row in reader:
-#         # X_test.append(row[1:14])
-#         X_test.append(row[:24] + [row[27]] + row[30:])
-#         # X_test.append(row[1:24]+[row[27]]+row[30:])
-#         X_test_eeventids.append(row[0])
 
 
 #################################Feature selection########################
@@ -128,6 +101,7 @@ clf2=RandomForestClassifier()
 # ])
 
 
+###################################Cross validation#######################
 if cross_validating:
     X_train, X_test, y_train, y_test = cross_validation.train_test_split(
         X_train, y_train, test_size=0.4, random_state=0)
@@ -139,6 +113,7 @@ if cross_validating:
     X_train = X_train[:, 1:-2]
     X_test = X_test[:, 1:-2]
 
+#######################Train model ###########################################
 if test_mode:
     clf2.fit(X_train[:10], y_train[:10])
     preds = clf2.predict(X_test[:10])
@@ -153,7 +128,7 @@ else:
     # preds=clf2.predict(selector.transform(X_test))
     print "prediction done"
     # probs=clf2.predict_proba(selector.transform(X_test))
-    probs = clf2.predict_proba((X_test))
+    probs = clf2.predict_proba((X_test)) # Get probabilities so we can predict RankOrder
     print "probabilties done"
 aprobs = [a[0] for a in probs]
 if test_mode:
@@ -197,6 +172,7 @@ f_out.writelines(f_in)
 f_out.close()
 f_in.close()
 
+#######################################Check CV score ##############################s
 if cross_validating:
     with open("solution.csv", "wb") as f:
         writer = csv.writer(f)
