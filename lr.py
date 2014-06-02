@@ -103,11 +103,11 @@ print "Input data read"
 
 
 ###################################Cross validation#######################
-
-@profile 
+metrics=[]
+# @profile 
 def cross_val():
     if cross_validating:
-        kf = cross_validation.KFold(len(X_train_orig)-1, n_folds=2)
+        kf = cross_validation.KFold(len(X_train_orig)-1, n_folds=3)
 
         for train_index, test_index in kf:
             print 'iterating'
@@ -205,5 +205,7 @@ def cross_val():
                 #     # finalsolution=[[a[0],b,a[1]] for a,b in zip(solutionlist,[a[-1] for a in ranked])]
                 #     writer.writerow("EventId,Label,Weight".split(","))
                 #     writer.writerows(solution)
-                AMS_metric("solution.csv", "submissions/" + name + ".csv", len(solution))
+                metrics.append(AMS_metric("solution.csv", "submissions/" + name + ".csv", len(solution)))
+
 cross_val()
+print 'average score',sum(metrics)/len(metrics)

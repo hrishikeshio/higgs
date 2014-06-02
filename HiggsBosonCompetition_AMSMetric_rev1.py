@@ -94,6 +94,7 @@ def AMS_metric(solution, submission,numEvents):
                 
         print 'signal = {0}, background = {1}'.format(signal, background)
         print 'AMS = ' + str(AMS(signal, background))
+        return AMS(signal, background)
 
 
 if __name__ == "__main__":
