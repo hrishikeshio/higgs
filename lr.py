@@ -19,6 +19,8 @@ from sklearn.pipeline import Pipeline
 
 from HiggsBosonCompetition_AMSMetric_rev1 import AMS_metric
 
+from memory_profiler import profile
+
 X_train = []
 y_train = []
 X_test = []
@@ -101,95 +103,107 @@ print "Input data read"
 
 
 ###################################Cross validation#######################
-if cross_validating:
-    kf = cross_validation.KFold(len(X_train_orig)-1, n_folds=2)
 
-    for train_index, test_index in kf:
-        print 'iterating'
-        print train_index[:10]
-        X_train = X_train_orig.iloc[train_index]
-        X_test = X_train_orig.iloc[test_index]
-        y_train, y_test = y_train_orig.iloc[train_index], y_train_orig.iloc[test_index]
-        # X_train, X_test, y_train, y_test = cross_validation.train_test_split(
-            # X_train, y_train, test_size=0.4, random_state=0)
-        # event_ids_list = [a[0] for a in(test_index)]
-        # print "event id list",event_ids_list[:10]
-        event_ids = iter(test_index)
-        # print X_train[:10]
-        # print X_test[:10]
-        solution = X_test.iloc[:, [0, -1, -2]]
-        # print "solution",solution[:10]
-        X_train = X_train.iloc[:, 1:-2]
-        X_test = X_test.iloc[:, 1:-2]
+@profile 
+def cross_val():
+    if cross_validating:
+        kf = cross_validation.KFold(len(X_train_orig)-1, n_folds=2)
 
-        #######################Train model ###########################################
-        if test_mode:
-            clf2.fit(X_train[:10], y_train[:10])
-            preds = clf2.predict(X_test[:10])
-            probs = clf2.predict_proba(X_test[:10])
-        else:
-            # clf2=LogisticRegression(C=1).fit(X_train,y_train)
-            # clf2=RandomForestClassifier().fit(X_train,y_train)
-            # clf2.fit(selector.transform(X_train),y_train)
-            clf2=RandomForestClassifier()
-            clf2.fit((X_train), y_train)
-            print "Model trained"
-            preds = clf2.predict(X_test)
-            # preds=clf2.predict(selector.transform(X_test))
-            print "prediction done"
-            # probs=clf2.predict_proba(selector.transform(X_test))
-            probs = clf2.predict_proba((X_test)) # Get probabilities so we can predict RankOrder
-            print "probabilties done"
-        aprobs = [a[0] for a in probs]
-        if test_mode:
-            print X_train[1]
-            print X_test[1]
-            print y_train[1]
-            print len(X_train[1])
-            print len(X_test[1])
-            print y_train[1]
-            print probs
-            print aprobs
+        for train_index, test_index in kf:
+            print 'iterating'
 
-        ans = []
-        probiter = iter(aprobs)
-        # print len(aprobs),len(event_ids)
-        for a in preds:
-            ans.append([event_ids.next()] + [a] + [probiter.next()])
+            X_train = []
+            y_train = []
+            X_test = []
+            y_test = []
+            # print train_index[:10]
+            X_train = X_train_orig.iloc[train_index]
+            X_test = X_train_orig.iloc[test_index]
+            y_train, y_test = y_train_orig.iloc[train_index], y_train_orig.iloc[test_index]
+            # X_train, X_test, y_train, y_test = cross_validation.train_test_split(
+                # X_train, y_train, test_size=0.4, random_state=0)
+            # event_ids_list = [a[0] for a in(test_index)]
+            # print "event id list",event_ids_list[:10]
+            event_ids = iter(test_index)
+            # print X_train[:10]
+            # print X_test[:10]
+            solution = X_test.iloc[:, [0, -1, -2]]
+            # print "solution",solution[:10]
+            X_train = X_train.iloc[:, 1:-2]
+            X_test = X_test.iloc[:, 1:-2]
 
-        ans_sorted = sorted(ans, key=itemgetter(2),  reverse=True)
-        if test_mode:
-            print "ans", ans
-            print "final", ans_sorted
+            #######################Train model ###########################################
+            if test_mode:
+                clf2.fit(X_train[:10], y_train[:10])
+                preds = clf2.predict(X_test[:10])
+                probs = clf2.predict_proba(X_test[:10])
+            else:
+                # clf2=LogisticRegression(C=1).fit(X_train,y_train)
+                # clf2=RandomForestClassifier().fit(X_train,y_train)
+                # clf2.fit(selector.transform(X_train),y_train)
+                clf2=RandomForestClassifier()
+                clf2.fit((X_train), y_train)
+                print "Model trained"
+                preds = clf2.predict(X_test)
+                # preds=clf2.predict(selector.transform(X_test))
+                print "prediction done"
+                # probs=clf2.predict_proba(selector.transform(X_test))
+                probs = clf2.predict_proba((X_test)) # Get probabilities so we can predict RankOrder
+                print "probabilties done"
+            aprobs = [a[0] for a in probs]
+            if test_mode:
+                print X_train[1]
+                print X_test[1]
+                print y_train[1]
+                print len(X_train[1])
+                print len(X_test[1])
+                print y_train[1]
+                print probs
+                print aprobs
 
-        length = iter(range(100000000))
-        ranked = []
-        length.next()
-        for a in ans_sorted:
-            ranked.append(a + [length.next()])
-        # print "ranked",ranked
-        name = "submission_ours" # Output file name
+            ans = []
+            probiter = iter(aprobs)
+            # print len(aprobs),len(event_ids)
+            for a in preds:
+                ans.append([event_ids.next()] + [a] + [probiter.next()])
 
-        with open("submissions/" + name + ".csv", "wb") as f:
-            writer = csv.writer(f)
-            writer.writerow(["EventId", "RankOrder", "Class"])
-            for row in ranked:
-                writer.writerow([row[0], row[-1], row[1]])
+            ans_sorted = sorted(ans, key=itemgetter(2),  reverse=True)
+            if test_mode:
+                print "ans", ans
+                print "final", ans_sorted
 
-        f_in = open("submissions/" + name + ".csv", 'rb')
-        f_out = gzip.open("submissions/" + name + ".csv.gz", 'wb') # Gzip file so we can upload it quickly
-        f_out.writelines(f_in)
-        f_out.close()
-        f_in.close()
+            # length = iter(range(100000000))
+            ranked = []
+            # length.next()
+            for a,b in zip(ans_sorted,range(1,len(ans_sorted)+1)):
+                ranked.append(a + [b])
+            # print ranked[:10]
+            # print zip(ranked)
+            # exit()
+            # print "ranked",ranked
+            name = "submission_ours" # Output file name
 
-        #######################################Check CV score ##############################s
-        if cross_validating:
-            solution.iloc[:,1:].to_csv("solution.csv")
-            # with open("solution.csv", "wb") as f:
-            #     writer = csv.writer(f)
-            #     solutionlist = solution.tolist()
-            #     # ranks=range(len(solutionlist))
-            #     # finalsolution=[[a[0],b,a[1]] for a,b in zip(solutionlist,[a[-1] for a in ranked])]
-            #     writer.writerow("EventId,Label,Weight".split(","))
-            #     writer.writerows(solution)
-            AMS_metric("solution.csv", "submissions/" + name + ".csv", len(solution))
+            with open("submissions/" + name + ".csv", "wb") as f:
+                writer = csv.writer(f)
+                writer.writerow(["EventId", "RankOrder", "Class"])
+                for row in ranked:
+                    writer.writerow([row[0], row[-1], row[1]])
+
+            f_in = open("submissions/" + name + ".csv", 'rb')
+            f_out = gzip.open("submissions/" + name + ".csv.gz", 'wb') # Gzip file so we can upload it quickly
+            f_out.writelines(f_in)
+            f_out.close()
+            f_in.close()
+
+            #######################################Check CV score ##############################s
+            if cross_validating:
+                solution.iloc[:,1:].to_csv("solution.csv")
+                # with open("solution.csv", "wb") as f:
+                #     writer = csv.writer(f)
+                #     solutionlist = solution.tolist()
+                #     # ranks=range(len(solutionlist))
+                #     # finalsolution=[[a[0],b,a[1]] for a,b in zip(solutionlist,[a[-1] for a in ranked])]
+                #     writer.writerow("EventId,Label,Weight".split(","))
+                #     writer.writerows(solution)
+                AMS_metric("solution.csv", "submissions/" + name + ".csv", len(solution))
+cross_val()
