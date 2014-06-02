@@ -73,6 +73,10 @@ y_train_orig = X_train_orig["Label"]
 X_test_orig = pd.read_csv("raw/test.csv")
 print "Input data read"
 
+exclude=["PRI_jet_subleading_phi","PRI_jet_subleading_eta","PRI_jet_leading_phi","PRI_jet_leading_eta"]
+# exclude=[]
+X_train_orig=X_train_orig[[column for column in X_train_orig.columns if column not in exclude ]]
+
 
 #################################Feature selection########################
 # if feature_selection:
