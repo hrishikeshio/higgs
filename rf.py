@@ -73,7 +73,7 @@ y_train_orig = X_train_orig["Label"]
 X_test_orig = pd.read_csv("raw/test.csv")
 print "Input data read"
 
-exclude=["PRI_jet_subleading_phi","PRI_jet_subleading_eta","PRI_jet_leading_phi","PRI_jet_leading_eta"]
+exclude=["PRI_tau_phi","PRI_lep_phi","PRI_met_phi","PRI_jet_leading_phi","PRI_jet_subleading_phi"]
 # exclude=[]
 X_train_orig = X_train_orig[[column for column in X_train_orig.columns if column not in exclude ]]
 X_test_orig = X_test_orig[[column for column in X_test_orig.columns if column not in exclude ]]
@@ -94,7 +94,7 @@ else:
     # clf2=LogisticRegression(C=1).fit(X_train,y_train)
     # clf2=RandomForestClassifier().fit(X_train,y_train)
     # clf2.fit(selector.transform(X_train),y_train)
-    clf2=RandomForestClassifier()
+    clf2=RandomForestClassifier(random_state=0)
     clf2.fit((X_train), y_train)
     print "Model trained"
     preds = clf2.predict(X_test)
